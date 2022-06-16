@@ -87,6 +87,6 @@ class DBStorage:
         if cls is not None:
             return (self.__session.query(cls).count())
         counter = 0
-        for class in classes.values():
+        for clss in classes.values():
             counter += self.__session.query(clss).count()
         return counter

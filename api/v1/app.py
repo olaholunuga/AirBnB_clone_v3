@@ -1,24 +1,30 @@
 #!/usr/bin/python3
-"""Your first endpoint (route) will be to 
-return the status of your API"""
+"""RESTfull API for the project 
+"""
 
-from flask import Flask, make_reponse, jsonify
-from flask_cors import CORS
+from flask import Flask, jsonify
 from models import storage
-from api.v1.views import views
-import os
+from api.v1.views import app_views
+from os import getenv
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
-cors = CORS(app, resources={r'/*': {'origins': '0.0.0.0'}})
+CORS(app, resources=r"/*", origins="0.0.0.0")
+app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return jsonify(
+        {
+            "error": "Not found"
+        }
+    )
 
 @app.teardown_appcontext
-def teardown(exception):
-    """method for tearing down app"""
-    if storage is not None:
-        storage.close()
+def teardown_app(exc):
+    storage.close()
+
 
 if __name__ == "__main__":
-    host = os.getenv("HBNB_API_HOST", "0.0.0.0")
-    port = os.getenv("HBNB_API_HOST", "5000")
-    app.run(host=host, port=port, threaded=True)
+    app.run(host=getenv("HBNB_API_HOST"), port=getenv("HBNB_API_PORT"), threaded=True)
